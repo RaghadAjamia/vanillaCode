@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Floor No.4 Analytics</title>
+<style>
+  :root{
+    --glass-bg: rgba(255,255,255,0.12);
+    --glass-card: rgba(255,255,255,0.18);
+    --text: #f3f3f3;
+    --muted: #d8d8d8;
+    --brand: #ff8a00;   /* orange line / gauge */
+    --brand-2:#8fb3ff;  /* blue line */
+    --accent:#ffffff;
+    --shadow: 0 10px 30px rgba(0,0,0,.25);
+    --radius: 18px;
+  }
+
+  /* Background hero (aerial image vibe) */
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    color: var(--text);
+    min-height:100vh;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.65)),
+      url('https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
+  }
+
+  /* Top bar */
+  .topbar{
+    position:fixed; inset:0 0 auto 0; height:64px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px;
+    backdrop-filter: blur(10px);
+    background: rgba(20,20,20,.35);
+    box-shadow: var(--shadow);
+    z-index:1000;
+  }
+  .brand{
+    display:flex; align-items:center; gap:14px;
+  }
+  .burger{
+    width:36px; height:36px; border-radius:10px;
+    display:grid; place-items:center; cursor:pointer;
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.15);
+  }
+  .burger div{ width:18px; height:2px; background:#fff; position:relative; }
+  .burger div::before,.burger div::after{
+    content:""; position:absolute; left:0; width:18px; height:2px; background:#fff;
+  }
+  .burger div::before{ top:-6px } .burger div::after{ top:6px }
+
+  .logo{
+    font-weight:700; letter-spacing:.4px; display:flex; align-items:center; gap:8px;
+  }
+  .logo .badge{ font-weight:600; opacity:.85; }
+  .right-label{
+    display:flex; align-items:center; gap:10px; font-weight:600; opacity:.9;
+  }
+  .right-label .grid{
+    width:18px; height:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+  }
+  .right-label .grid span{ background:#fff; opacity:.85; border-radius:2px; }
+
+  /* Sidebar */
+  .sidebar{
+    position:fixed; top:0; left:-280px; width:280px; height:100vh;
+    background: rgba(25,25,25,.88);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow);
+    transition:left .3s ease;
+    z-index:1100;
+    padding:80px 16px 16px;
+  }
+  .sidebar.open{ left:0 }
+  .backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:1050;
+  }
+  .backdrop.show{ display:block }
+  .side-item{
+    padding:12px 14px; border-radius:12px; margin-bottom:8px; cursor:pointer;
+    background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  }
+  .side-item:hover{ background: rgba(255,255,255,.12) }
+
+  /* Glass container */
+  .sheet{
+    max-width:1200px; margin:90px auto 40px; padding:26px;
+    background: var(--glass-bg); border:1px solid rgba(255,255,255,.18);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px) saturate(120%);
+  }
+
+  .sheet-header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:18px;
+  }
+  .title{
+    font-size:26px; font-weight:800; letter-spacing:.2px;
+    text-shadow: 0 1px 0 rgba(0,0,0,.3);
+  }
+  .close{
+    width:38px; height:38px; border-radius:12px; display:grid; place-items:center;
+    background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18);
+    cursor:pointer;
+  }
+
+  /* Grid of cards */
+  .grid{
+    display:grid; gap:18px;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .card{
+    background: var(--glass-card);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding:16px;
+  }
+  .card h4{
+    margin:2px 0 12px; font-size:15px; font-weight:700; color:var(--accent);
+    letter-spacing:.3px;
+  }
+  .soft{
+    color: var(--muted); font-weight:600; font-size:12px; letter-spacing:.3px;
+  }
+
+  /* Layout similar to screenshot */
+  .c-line-1{ grid-column: span 6; min-height:240px }
+  .c-line-2{ grid-column: span 6; min-height:240px }
+  .c-gauge { grid-column: span 3; min-height:240px; display:flex; flex-direction:column; gap:10px }
+  .c-alarms{ grid-column: span 3; display:flex; flex-direction:column; gap:12px }
+  .c-wide  { grid-column: span 6; min-height:240px }
+
+  .metric{
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius: 14px;
+    padding:12px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .metric .name{ font-weight:700; }
+  .metric .value{
+    background:#fff; color:#222; padding:8px 10px; border-radius:10px; font-weight:800; min-width:84px; text-align:center;
+  }
+  .bar{
+    width:100%; height:6px; border-radius:8px; background:rgba(255,255,255,.18); overflow:hidden;
+  }
+  .bar>span{ display:block; height:100%; background: linear-gradient(90deg, #ffe0b8, var(--brand)); width:40% }
+
+  /* canvases */
+  canvas{ width:100%; height:160px; display:block }
+
+  /* Tags on cards (like “kW” under gauge) */
+  .tiny{
+    font-size:11px; opacity:.9; letter-spacing:.3px;
+  }
+
+  @media (max-width: 1024px){
+    .grid{ grid-template-columns: repeat(6,1fr); }
+    .c-line-1,.c-line-2,.c-wide{ grid-column: span 6 }
+    .c-gauge,.c-alarms{ grid-column: span 3 }
+  }
+  @media (max-width: 680px){
+    .grid{ grid-template-columns: repeat(1,1fr); }
+    .c-gauge,.c-alarms{ grid-column: span 1 }
+  }
+</style>
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="burger" id="burger"><div></div></div>
+      <div class="logo">
+        <strong>pwc</strong>
+        <span class="badge soft">Workstation by Innovare</span>
+      </div>
+    </div>
+    <div class="right-label">
+      <div class="grid" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <span>Analytics</span>
+    </div>
+  </header>
+
+  <!-- Sidebar + Backdrop -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-item">Overview</div>
+    <div class="side-item">Floors</div>
+    <div class="side-item">Devices</div>
+    <div class="side-item">Energy</div>
+    <div class="side-item">Water</div>
+    <div class="side-item">Settings</div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- Glass sheet -->
+  <main class="sheet" id="sheet">
+    <div class="sheet-header">
+      <div class="title">Floor No.4 Analytics</div>
+      <button class="close" id="closeSheet" title="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <section class="grid">
+      <!-- Top row: 2 line charts -->
+      <div class="card c-line-1">
+        <h4>Total Power</h4>
+        <canvas id="line1"></canvas>
+      </div>
+      <div class="card c-line-2">
+        <h4>Total Energy</h4>
+        <canvas id="line2"></canvas>
+      </div>
+
+      <!-- Gauge + Alarms -->
+      <div class="card c-gauge">
+        <h4>Total Power</h4>
+        <canvas id="gauge"></canvas>
+        <div class="metric">
+          <span class="name">kW</span>
+          <span class="value" id="kwVal">3,671</span>
+        </div>
+        <span class="tiny soft">kWh/month</span>
+      </div>
+
+      <div class="card c-alarms">
+        <h4>Active Alarms</h4>
+
+        <div class="metric">
+          <div>
+            <div class="name">AVG. CO₂ Level</div>
+            <div class="bar"><span style="width:68%"></span></div>
+          </div>
+          <div class="value">3,671</div>
+        </div>
+
+        <div class="metric">
+          <div>
+            <div class="name">Power Factor</div>
+            <div class="bar"><span style="width:42%"></span></div>
+          </div>
+          <div class="value">-0.05</div>
+        </div>
+      </div>
+
+      <!-- Bottom row examples -->
+      <div class="card c-wide">
+        <h4>Water Consumption</h4>
+        <canvas id="line3"></canvas>
+      </div>
+      <div class="card c-wide">
+        <h4>Temperature</h4>
+        <canvas id="line4"></canvas>
+      </div>
+    </section>
+  </main>
+
+<script>
+/* ====== Sidebar toggle ====== */
+const burger = document.getElementById('burger');
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+burger.addEventListener('click', () => {
+  sidebar.classList.add('open');
+  backdrop.classList.add('show');
+  document.body.style.overflow='hidden';
+});
+backdrop.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  backdrop.classList.remove('show');
+  document.body.style.overflow='';
+});
+
+/* ====== Close sheet (just hides the glass block like the “X” in shot) ====== */
+const sheet = document.getElementById('sheet');
+document.getElementById('closeSheet').addEventListener('click', () => {
+  sheet.style.transform = 'scale(.98)';
+  sheet.style.opacity = '0';
+  sheet.style.pointerEvents = 'none';
+  setTimeout(()=> sheet.style.display='none', 220);
+});
+
+/* ====== Tiny charting helpers (pure canvas) ====== */
+function drawLineChart(canvas, seriesA, seriesB, opts={}){
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR; ctx.scale(DPR, DPR);
+
+  // padding & axes
+  const pad = {t:14, r:14, b:24, l:32};
+  ctx.clearRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let i=0;i<4;i++){
+    const y = pad.t + ((H-pad.t-pad.b)/4)*i;
+    ctx.moveTo(pad.l, y); ctx.lineTo(W-pad.r, y);
+  }
+  ctx.stroke();
+
+  const all = [...seriesA, ...(seriesB||[])];
+  const min = Math.min(...all);
+  const max = Math.max(...all)*1.1;
+
+  function p(i, val, arr){
+    const x = pad.l + (i/(arr.length-1))*(W-pad.l-pad.r);
+    const y = pad.t + (1-(val-min)/(max-min))*(H-pad.t-pad.b);
+    return [x,y];
+  }
+
+  function line(arr, color){
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    arr.forEach((v,i)=>{
+      const [x,y]=p(i,v,arr);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+  }
+  function area(arr, color){
+    const grad = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+    grad.addColorStop(0, color.replace('1)', '.25)'));
+    grad.addColorStop(1, color.replace('1)', '0)'));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    arr.forEach((v,i)=>{ const [x,y]=p(i,v,arr); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.lineTo(W-pad.r, H-pad.b); ctx.lineTo(pad.l, H-pad.b); ctx.closePath(); ctx.fill();
+  }
+
+  if(seriesB){
+    area(seriesB, 'rgba(143,179,255,1)');
+    line(seriesB, 'rgba(143,179,255,1)');
+  }
+  area(seriesA, 'rgba(255,138,0,1)');
+  line(seriesA, 'rgba(255,138,0,1)');
+}
+
+function drawGauge(canvas, valuePct){
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR; ctx.scale(DPR, DPR);
+  ctx.clearRect(0,0,W,H);
+
+  const cx=W/2, cy=H*0.9, r=Math.min(W, H*1.6)/2;
+
+  // Track
+  ctx.lineWidth=16; ctx.lineCap='round';
+  function arc(from,to, color){
+    ctx.beginPath();
+    ctx.strokeStyle=color;
+    ctx.arc(cx,cy,r,Math.PI - from, Math.PI - to, true);
+    ctx.stroke();
+  }
+  // Colored segments (approx like screenshot)
+  arc( Math.PI*0.00, Math.PI*0.33, 'rgba(255,224,184,1)'); // light
+  arc( Math.PI*0.34, Math.PI*0.66, 'rgba(255,180,110,1)'); // mid
+  arc( Math.PI*0.67, Math.PI*1.00, 'rgba(255,138,0,1)');   // brand
+
+  // Needle
+  const angle = Math.PI * (1 - valuePct); // 0..1
+  const x = cx + (r-6)*Math.cos(Math.PI - angle);
+  const y = cy - (r-6)*Math.sin(Math.PI - angle);
+  ctx.strokeStyle='#222'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+
+  // Center dot
+  ctx.beginPath(); ctx.fillStyle='#fff'; ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fill();
+}
+
+/* ====== Demo data & render ====== */
+const d1 = [5,9,12,18,26,21,24,23,27,26,29,28];
+const d2 = [4,8,10,12,17,16,18,16,19,18,22,21];
+const d3 = [6,7,9,11,10,12,14,13,15,16,18,19];
+const d4 = [22,21,23,24,26,25,27,28,27,29,30,31];
+
+function renderAll(){
+  drawLineChart(document.getElementById('line1'), d1, d2);
+  drawLineChart(document.getElementById('line2'), d4, d3);
+  drawLineChart(document.getElementById('line3'), d3, d2);
+  drawLineChart(document.getElementById('line4'), d2, d1);
+  drawGauge(document.getElementById('gauge'), 0.62); // 62%
+}
+renderAll();
+addEventListener('resize', renderAll);
+
+/* (Optional) little pulse to mimic live */
+setInterval(()=>{
+  // tiny jitter on gauge
+  const v = 0.58 + Math.random()*0.1;
+  drawGauge(document.getElementById('gauge'), v);
+}, 2500);
+</script>
+</body>
+</html>

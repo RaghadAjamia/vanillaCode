@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PWC Workstation – Floor Plan</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="first.css">
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header-wrapper" id="appHeader">
+    <!-- left -->
+    <div class="header-container">
+      <img id="menuBtn" src="assets/icons/Menu.svg" alt="Menu" />
+      <img src="assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+        Workstation<br/>by Innowave
+      </p>
+    </div>
+    <!-- right (Analytics) -->
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+      <img src="assets/icons/sun.png" alt="Analytics" />
+      <p style="margin:0">Light</p>
+    <p></p>
+            <img src="assets/icons/hvac.png" alt="Analytics" />
+      <p style="margin:0">HVAC</p>
+      <p></p>
+            <img src="assets/icons/alert.png" alt="Analytics" />
+      <p style="margin:0">Alarm</p>
+       <p></p>
+            <img src="assets/icons/Analytics.svg" alt="Analytics" />
+      <p style="margin:0">Analytics</p>
+      
+    </div>
+    
+  </header>
+
+  <!-- Backdrop (keep this; the sidebar is added by JS) -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <!-- Bottom center pills -->
+  <div class="bottom-pills">
+    <button class="pill" id="pillLight" title="Lights">
+            <img src="assets/icons/light_dark.png" alt="fire" />
+      Light
+    </button>
+    <button class="pill" id="pillCO2" title="CO2">
+            <img src="assets/icons/co2.png" alt="fire" />
+      CO2
+    </button>
+    <button class="pill" id="pillFire" title="Fire">
+            <img src="assets/icons/fire.png" alt="fire" />
+      Fire
+    </button>
+  </div>
+
+  <!-- Right floating floors -->
+<div class="floater">
+  <a href="/floor5" class="fab">F5</a>
+  <a href="/floor4" class="fab">F4</a>
+  <a href="/floor3" class="fab">F3</a>
+</div>
+
+
+<!-- Analytics Modal -->
+<div class="ana-modal" id="anaModal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="ana-sheet" role="document">
+    <header class="ana-head">
+      <h2>Floor No.4 Analytics</h2>
+      <button class="ana-close" id="anaClose" aria-label="Close">&times;</button>
+    </header>
+
+    <div class="ana-grid">
+  <!-- Line Chart -->
+  <section class="ana-card line-main">
+    <h3>Total Power</h3>
+    <canvas id="anaLine1"></canvas>
+  </section>
+
+  <!-- Gauge -->
+<section class="ana-card gauge-card">
+  <h3>Total Power</h3>
+  <div class="gauge-wrap">
+    <div id="anaGauge"></div>
+    
+  </div>
+</section>
+
+
+  <!-- 3 Stacked Cards -->
+  <div class="side-cards">
+       <div class="ana-card white-card">
+      <span class="title">Power Factor</span>
+      <strong>3,671</strong>
+      <div class="ana-sub">−0.05%</div>
+    </div>
+    <div class="ana-card white-card">
+      <span class="title">AVG. CO2 Level</span>
+      <strong>3,671</strong>
+      <div class="ana-bar"><div style="width:62%"></div></div>
+    </div>
+ 
+    <div class="ana-card white-card">
+      <span class="title">Another Metric</span>
+      <strong>2,145</strong>
+      <div class="ana-bar"><div style="width:45%"></div></div>
+    </div>
+  </div>
+
+  <!-- Second Row Charts -->
+  <section class="ana-card line-2">
+    <h3>Total Energy</h3>
+    <canvas id="anaLine2"></canvas>
+  </section>
+
+  <section class="ana-card line-3">
+    <h3>Water Consumption</h3>
+    <canvas id="anaLine3"></canvas>
+  </section>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+  <!-- Scripts (order matters) -->
+  <script src="sidebar.js"></script>
+  <script src="first.js"></script>
+</body>
+</html>

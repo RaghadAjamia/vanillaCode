@@ -1,0 +1,56 @@
+/* === sidebar.css === */
+:root{
+  --linear-background: linear-gradient(135deg, rgba(24,24,24,.92), rgba(40,40,40,.88));
+  --white: #ffffff;
+  --black-o4: rgba(0,0,0,.4);
+  --radius: 18px;
+}
+
+/* Container */
+.sidebar{
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  display: none; /* toggled by .openSideBar */
+  flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  padding: 32px; z-index: 101;
+  color: var(--white);
+  background: var(--linear-background);
+  backdrop-filter: blur(15px);
+}
+
+.sidebar.openSideBar{ display: flex; }
+
+/* Large screens (≈ “laptop”) */
+@media (min-width: 1024px){
+  .sidebar{
+    position: absolute; left: 45px; top: 150px;
+    width: 286px; height: 68%;
+    align-items: flex-start; justify-content: flex-start;
+    border-radius: var(--radius);
+  }
+}
+
+/* Sections */
+.sectionContainer{ display: flex; flex-direction: column; gap: 10px; width: 100% }
+.sectionContainer h1{ margin: 0 0 4px; font-size: 24px; font-weight: 400 }
+
+/* Items, dropdowns */
+li{ list-style: none; color: var(--white); min-height: 35px; }
+ul{ margin: 0; padding: 0; }
+
+.dropdownToggle{
+  display: flex; align-items: center; gap: 8px;
+  background: transparent; border: 0; color: var(--white);
+  font-size: 1rem; cursor: pointer; width: 100%; padding: 8px 10px; border-radius: 12px;
+}
+.dropdownToggle:hover{ background: var(--black-o4); }
+
+.dropdown{ margin-left: 48px; display: none; height: fit-content; }
+.dropdown.show{ display: block; }
+
+.closeSideBar{
+  position: absolute; right: 45px; top: 45px; display: block; cursor: pointer;
+}
+@media (min-width: 1024px){ .closeSideBar{ display: none } }
+
+/* Little icon circle (if you use inline SVGs below) */
+.icon{ width: 18px; height: 18px; display: inline-block }

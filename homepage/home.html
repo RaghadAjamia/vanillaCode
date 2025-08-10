@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home Page</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+<video autoplay muted loop playsinline id="bgVideo">
+  <source src="../assets/video/background.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+  <!-- Header -->
+  <header class="header-wrapper" id="appHeader">
+    <!-- left -->
+    <div class="header-container">
+      <img id="menuBtn" src="../assets/icons/Menu.svg" alt="Menu" />
+      <img src="../assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+        Workstation<br/>by Innowave
+      </p>
+    </div>
+    <!-- right (Analytics) -->
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+    
+            <img src="../assets/icons/Analytics.svg" alt="Analytics" />
+      <p style="margin:0">Analytics</p>
+      
+    </div>
+    
+  </header>
+
+  <!-- Backdrop (keep this; the sidebar is added by JS) -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  </div>
+
+
+
+<!-- Analytics Modal -->
+<div class="ana-modal" id="anaModal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="ana-sheet" role="document">
+    <header class="ana-head">
+      <h2>Analytics</h2>
+      <button class="ana-close" id="anaClose" aria-label="Close">&times;</button>
+    </header>
+
+    <div class="ana-grid">
+  <!-- Line Chart -->
+  <section class="ana-card line-main">
+    <h3>Total Power</h3>
+    <canvas id="anaLine1"></canvas>
+  </section>
+
+  <!-- Gauge -->
+<section class="ana-card gauge-card">
+  <h3>Total Power</h3>
+  <div class="gauge-wrap">
+    <div id="anaGauge"></div>
+    
+  </div>
+</section>
+
+
+  <!-- 3 Stacked Cards -->
+  <div class="side-cards">
+       <div class="ana-card white-card">
+      <span class="title">Power Factor</span>
+      <strong>3,671</strong>
+      <div class="ana-sub">−0.05%</div>
+    </div>
+    <div class="ana-card white-card">
+      <span class="title">AVG. CO2 Level</span>
+      <strong>3,671</strong>
+      <div class="ana-bar"><div style="width:62%"></div></div>
+    </div>
+ 
+    <div class="ana-card white-card">
+      <span class="title">Another Metric</span>
+      <strong>2,145</strong>
+      <div class="ana-bar"><div style="width:45%"></div></div>
+    </div>
+  </div>
+
+  <!-- Second Row Charts -->
+  <section class="ana-card line-2">
+    <h3>Total Energy</h3>
+    <canvas id="anaLine2"></canvas>
+  </section>
+
+  <section class="ana-card line-3">
+    <h3>Water Consumption</h3>
+    <canvas id="anaLine3"></canvas>
+  </section>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+  <!-- Scripts (order matters) -->
+  <script src="sidebar.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>
