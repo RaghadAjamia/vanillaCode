@@ -1,3 +1,4 @@
+
 // ===== DEBUG LOGS =====
 console.log('[first.js] loaded');
 const menuBtn    = document.getElementById('menuBtn');
