@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PWC Workstation – cards view</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sidebar.css">
+
+  <!-- make anchorش-cards look like your tiles -->
+  <style>
+    .glass-card { color: var(--white); text-decoration: none; cursor: pointer }
+    .glass-card:focus-visible { outline: 2px solid #fff; outline-offset: 3px }
+  </style>
+
+</head>
+<body>
+  <video id="bgVideo" autoplay muted loop playsinline class="bg-video">
+    <source src="../assets/video/0820.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Header -->
+  <header class="header-wrapper" id="appHeader">
+    <div class="header-container">
+      <img id="menuBtn" src="../assets/icons/Menu.svg" alt="Menu" />
+      <img src="../assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+       BMS Workstation<br/>by <b>Innowave</b> 
+      </p>
+    </div>
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+      <img src="../assets/images/lets-icons_humidity-light.png" alt="Analytics" />
+     <b><p style="margin:0">49%</p></b> 
+
+      <img src="../assets/icons/mdi_temperature.png"alt="Analytics" />
+       <b><p style="margin:0">36.5</p></b> 
+
+      <img src="../assets/icons/iconamoon_profile-fill.png" alt="Analytics" />
+      <b> <p style="margin:0">Admin</p></b> 
+    </div>
+  </header>
+
+  <!-- Center Glass Cards (now links) -->
+  <main class="center-stage">
+    <div class="center-grid">
+      <a class="glass-card" href="floors.html" aria-label="Go to Floors">
+        <img src="../assets/icons/light.png" alt="" />
+        <h3>Floors</h3>
+                <p>Data insights</p>
+
+      </a>
+
+      <a class="glass-card" href="cards.html" aria-label="Go to Equipment">
+        <img src="../assets/icons/hvacc.png" alt="" />
+        <h3>Equipment</h3>
+                <p>Data insights</p>
+
+      </a>
+
+      <a class="glass-card" href="alarm.html" aria-label="Go to Alarm">
+        <img src="../assets/icons/alert-fill.png" alt="" />
+        <h3>Alarm</h3>
+                <p>Data insights</p>
+
+      </a>
+
+      <a class="glass-card" href="cards_typical.html" aria-label="Go to Analytics">
+        <img src="../assets/icons/dash.png" alt="" />
+        <h3>Analytics</h3>
+        <p>Data insights</p>
+      </a>
+    </div>
+  </main>
+
+  <!-- Bottom Footer Bar -->
+  <div class="footer-bar">
+    <div class="footer-bar-content">
+      <div class="footer-logo">
+        <img src="../assets/images/Innowave_logo_white_version (1).png" alt="Innowave Logo" />
+      </div>
+      <footer class="footer-copyright">
+        © 2025 Innowave. All rights reserved.
+      </footer>
+    </div>
+  </div>
+
+  <!-- Slow down background video -->
+  <script>
+    ;(() => {
+      const rate = 0.7
+      const v = document.getElementById('bgVideo')
+      if (!v) return
+      const applyRate = () => { v.defaultPlaybackRate = rate; v.playbackRate = rate }
+      v.addEventListener('loadedmetadata', applyRate)
+      v.addEventListener('play', applyRate)
+      if (!v.paused) applyRate()
+    })()
+  </script>
+    <script src="./sidebar.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Create the sidebar and append it to the body
+    const sidebar = createSidebar({
+      isOpen: false,
+      onClose: () => {
+        sidebar.close()
+        backdrop.classList.remove('show')
+      }
+    })
+
+    document.body.appendChild(sidebar)
+
+    // Create the backdrop and append it to the body
+    const backdrop = document.createElement('div')
+    backdrop.className = 'backdrop'
+    document.body.appendChild(backdrop)
+
+    // Close sidebar when clicking the backdrop
+    backdrop.addEventListener('click', () => {
+      sidebar.close()
+      backdrop.classList.remove('show')
+    })
+
+    // Toggle sidebar on menu icon click
+    const menuBtn = document.getElementById('menuBtn')
+    menuBtn?.addEventListener('click', () => {
+      sidebar.open()
+      backdrop.classList.add('show')
+    })
+  })
+</script>
+
+</body>
+</html>

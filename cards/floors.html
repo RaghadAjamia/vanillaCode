@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PWC Workstation – Floors (Records)</title>
+
+  <!-- Reuse your global styles -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sidebar.css">
+
+  <style>
+    /* ===== Records page layout ===== */
+    .records-stage {
+      min-height: 100vh;
+      padding: calc(var(--header-h) + 24px) 24px 100px;
+      box-sizing: border-box;
+      position: relative;
+      z-index: 2; /* above body overlays */
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+    }
+
+    /* Toolbar */
+    .records-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+
+      background: var(--gray-opacity35);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-radius: var(--primary-radius);
+      padding: 12px 14px;
+      color: var(--white);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .records-toolbar h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .records-toolbar .field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .records-toolbar input[type="search"],
+    .records-toolbar select {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font: inherit;
+      min-width: 180px;
+      outline: none;
+    }
+    .records-toolbar input::placeholder { color: rgba(255,255,255,.7) }
+
+    @media (max-width: 720px) {
+      .records-toolbar {
+        grid-template-columns: 1fr;
+      }
+      .records-toolbar .field {
+        justify-content: space-between;
+      }
+      .records-toolbar input[type="search"],
+      .records-toolbar select {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    /* Records list (rows) */
+    .records-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    /* A single record row (anchor) */
+    .record {
+      display: grid;
+      grid-template-columns: 160px 1fr 140px 40px;
+      align-items: center;
+      gap: 12px;
+
+      padding: 14px 16px;
+      border-radius: var(--primary-radius);
+      text-decoration: none;
+      color: var(--white);
+
+      background: var(--gray-opacity35);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+
+      transition: box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+    }
+    .record:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(0,0,0,.28);
+      background-color: rgba(120,120,120,0.42);
+    }
+    .col-floor {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+    .col-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      opacity: .95;
+      font-size: 14px;
+    }
+    .metric {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      opacity: .9;
+    }
+    .metric b { font-weight: 700 }
+    .col-status {
+      display: flex;
+      justify-content: flex-start;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      white-space: nowrap;
+    }
+    .badge.ok { background: rgba(34,197,94,.18); border-color: rgba(34,197,94,.35) }       /* green */
+    .badge.maint { background: rgba(234,179,8,.20); border-color: rgba(234,179,8,.35) }    /* amber */
+    .badge.alert { background: rgba(239,68,68,.22); border-color: rgba(239,68,68,.35) }    /* red */
+
+    .col-arrow {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 18px;
+      opacity: .8;
+    }
+
+    @media (max-width: 920px) {
+      .record {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "floor status"
+          "metrics arrow";
+      }
+      .col-floor { grid-area: floor }
+      .col-status { grid-area: status; justify-content: flex-end }
+      .col-metrics { grid-area: metrics }
+      .col-arrow { grid-area: arrow; justify-content: flex-end }
+    }
+
+    @media (max-width: 520px) {
+      .record {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "floor"
+          "metrics"
+          "status";
+      }
+      .col-status { justify-content: flex-start }
+      .col-arrow { display: none }
+    }
+    /* Custom glass select */
+.sel { position: relative; display: inline-block; }
+
+.sel-trigger {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 44px; padding: 0 44px 0 14px;
+  border-radius: 22px;                         /* higher radius */
+  color: var(--white); font: inherit;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.10);
+  backdrop-filter: blur(8px) saturate(115%);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 24px rgba(0,0,0,.18);
+  cursor: pointer;
+}
+
+.sel-chevron {
+  width: 10px; height: 10px; margin-left: 2px;
+  border-right: 2px solid rgba(255,255,255,.9);
+  border-bottom: 2px solid rgba(255,255,255,.9);
+  transform: rotate(45deg); transition: transform .18s ease, opacity .18s ease;
+}
+
+.sel[open] .sel-chevron { transform: rotate(225deg); }
+
+.sel-menu {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  min-width: 240px; padding: 8px;
+  border-radius: 20px;                         /* higher radius */
+  background: rgba(255,255,255,.14);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border: 1px solid rgba(255,255,255,.24);
+  box-shadow: 0 24px 60px rgba(0,0,0,.35);
+  list-style: none; margin: 0;
+  display: none; z-index: 5;
+}
+
+.sel[open] .sel-menu { display: block; }
+
+.sel-menu [role="option"] {
+  padding: 10px 12px; border-radius: 14px; /* inner item radius */
+  color: var(--white); cursor: pointer;
+}
+
+.sel-menu [role="option"]:hover {
+  background: rgba(255,255,255,.18);
+}
+
+.sel-menu [role="option"][aria-selected="true"] {
+  background: linear-gradient(180deg, rgba(255,138,0,.25), rgba(255,138,0,.18));
+  border: 1px solid rgba(255,138,0,.45);
+}
+
+  </style>
+</head>
+<body>
+  <!-- Optional background video -->
+  <video id="bgVideo" autoplay muted loop playsinline class="bg-video">
+    <source src="../assets/video/0820.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Header -->
+  <header class="header-wrapper" id="appHeader">
+    <div class="header-container">
+      <img id="menuBtn" src="../assets/icons/Menu.svg" alt="Menu" />
+      <img src="../assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+       <b>BMS Workstation</b><br/>by Innowave
+      </p>
+    </div>
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+      <img src="../assets/images/lets-icons_humidity-light.png" alt="Analytics" />
+     <b><p style="margin:0">49%</p></b> 
+
+      <img src="../assets/icons/mdi_temperature.png"alt="Analytics" />
+       <b><p style="margin:0">36.5</p></b> 
+
+      <img src="../assets/icons/iconamoon_profile-fill.png" alt="Analytics" />
+      <b> <p style="margin:0">Admin</p></b> 
+    </div>
+  </header>
+
+  <!-- Records content -->
+  <main class="records-stage">
+    <!-- Toolbar -->
+    <div class="records-toolbar">
+      <h1>Floors</h1>
+
+      <div class="field">
+        <label for="q" style="opacity:.8">Search</label>
+        <input id="q" type="search" placeholder="Search floors… (e.g., B1, 01)" />
+      </div>
+
+</div>
+
+
+    </div>
+
+    <!-- Records list -->
+    <div class="records-list" id="records">
+      <!-- Repeat for 01..14. Update hrefs to your routes -->
+      <a class="record" href="floor-01.html" data-floor="1" aria-label="Open Floor 01">
+        <div class="col-floor">Floor B02</div>
+        <div class="col-metrics">
+          <span class="metric">Co2 Level <b>0.02%</b></span>
+          <span class="metric">Power Consumption<b>128</b></span>
+        </div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-02.html" data-floor="2" aria-label="Open Floor 02">
+        <div class="col-floor">Floor B01</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,310 m²</b></span><span class="metric">Devices <b>115</b></span><span class="metric">Occupancy <b>68%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-03.html" data-floor="3" aria-label="Open Floor 03">
+        <div class="col-floor">Floor L00</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,280 m²</b></span><span class="metric">Devices <b>97</b></span><span class="metric">Occupancy <b>61%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-04.html" data-floor="4" aria-label="Open Floor 04">
+        <div class="col-floor">Floor L01</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,260 m²</b></span><span class="metric">Devices <b>102</b></span><span class="metric">Occupancy <b>57%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-04.html" data-floor="4" aria-label="Open Floor 04">
+        <div class="col-floor">Floor L02</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,260 m²</b></span><span class="metric">Devices <b>102</b></span><span class="metric">Occupancy <b>57%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-05.html" data-floor="5" aria-label="Open Floor 05">
+        <div class="col-floor">Floor L03</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,240 m²</b></span><span class="metric">Devices <b>99</b></span><span class="metric">Occupancy <b>62%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-06.html" data-floor="6" aria-label="Open Floor 06">
+        <div class="col-floor">Floor L04</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,230 m²</b></span><span class="metric">Devices <b>101</b></span><span class="metric">Occupancy <b>59%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-07.html" data-floor="7" aria-label="Open Floor 07">
+        <div class="col-floor">Floor L05</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,220 m²</b></span><span class="metric">Devices <b>95</b></span><span class="metric">Occupancy <b>63%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-08.html" data-floor="8" aria-label="Open Floor 08">
+        <div class="col-floor">Floor L06</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,200 m²</b></span><span class="metric">Devices <b>110</b></span><span class="metric">Occupancy <b>58%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-09.html" data-floor="9" aria-label="Open Floor 09">
+        <div class="col-floor">Floor L07</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,180 m²</b></span><span class="metric">Devices <b>93</b></span><span class="metric">Occupancy <b>64%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-10.html" data-floor="10" aria-label="Open Floor 10">
+        <div class="col-floor">Floor L08</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,160 m²</b></span><span class="metric">Devices <b>96</b></span><span class="metric">Occupancy <b>66%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-11.html" data-floor="11" aria-label="Open Floor 11">
+        <div class="col-floor">Floor L09</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,140 m²</b></span><span class="metric">Devices <b>90</b></span><span class="metric">Occupancy <b>60%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-12.html" data-floor="12" aria-label="Open Floor 12">
+        <div class="col-floor">Floor L10</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,120 m²</b></span><span class="metric">Devices <b>88</b></span><span class="metric">Occupancy <b>55%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-13.html" data-floor="13" aria-label="Open Floor 13">
+        <div class="col-floor">Floor L11</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,100 m²</b></span><span class="metric">Devices <b>86</b></span><span class="metric">Occupancy <b>52%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+
+      <a class="record" href="floor-14.html" data-floor="14" aria-label="Open Floor 14">
+        <div class="col-floor">Floor RF</div>
+        <div class="col-metrics"><span class="metric">Area <b>2,080 m²</b></span><span class="metric">Devices <b>83</b></span><span class="metric">Occupancy <b>49%</b></span></div>
+        <div class="col-arrow">→</div>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer reuse -->
+  <div class="footer-bar">
+    <div class="footer-bar-content">
+      <div class="footer-logo">
+        <img src="../assets/images/Innowave_logo_white_version (1).png" alt="Innowave Logo" />
+      </div>
+      <footer class="footer-copyright">
+        © 2025 Innowave. All rights reserved.
+      </footer>
+    </div>
+  </div>
+
+  <!-- Optional: slow down bg video -->
+  <script>
+    ;(() => {
+      const rate = 0.7
+      const v = document.getElementById('bgVideo')
+      if (!v) return
+      const applyRate = () => { v.defaultPlaybackRate = rate; v.playbackRate = rate }
+      v.addEventListener('loadedmetadata', applyRate)
+      v.addEventListener('play', applyRate)
+      if (!v.paused) applyRate()
+    })()
+  </script>
+
+  <!-- Tiny search + sort -->
+  <script>
+    ;(() => {
+      const q = document.getElementById('q')
+      const sort = document.getElementById('sort')
+      const list = document.getElementById('records')
+
+      const rows = Array.from(list.querySelectorAll('.record'))
+
+      function apply() {
+        const term = (q.value || '').trim().toLowerCase()
+
+        // filter
+        rows.forEach(r => {
+          const text = r.textContent.toLowerCase()
+          r.style.display = text.includes(term) ? '' : 'none'
+        })
+
+        // sort
+        const dir = sort.value === 'desc' ? -1 : 1
+        const visible = rows.filter(r => r.style.display !== 'none')
+        visible.sort((a, b) => {
+          const fa = Number(a.dataset.floor)
+          const fb = Number(b.dataset.floor)
+          return (fa - fb) * dir
+        })
+        visible.forEach(r => list.appendChild(r))
+      }
+
+      q?.addEventListener('input', apply)
+      sort?.addEventListener('change', apply)
+      apply()
+    })()
+  </script>
+<div class="field">
+  <label id="sortLabel" style="opacity:.8">Sort</label>
+
+  <!-- This keeps your existing sorting JS working -->
+  <input type="hidden" id="sort" value="asc">
+
+  <div class="sel" id="selSort">
+    <button class="sel-trigger" id="selSortBtn"
+            aria-labelledby="sortLabel"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            type="button">
+      <span class="sel-value">Lowest → Highest</span>
+      <span class="sel-chevron" aria-hidden="true"></span>
+    </button>
+
+    <ul class="sel-menu" role="listbox" aria-labelledby="sortLabel">
+      <li role="option" aria-selected="true"  data-value="asc"  tabindex="0">Lowest → Highest</li>
+      <li role="option" aria-selected="false" data-value="desc" tabindex="-1">Highest → Lowest</li>
+    </ul>
+  </div>
+</div>
+
+
+</body>
+</html>

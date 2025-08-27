@@ -10,12 +10,10 @@
   <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
-<video autoplay muted loop playsinline id="bgVideo">
-  <source src="../assets/video/background.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
-  <!-- Header -->
+
+
+
   <header class="header-wrapper" id="appHeader">
     <!-- left -->
     <div class="header-container">
@@ -100,12 +98,24 @@
 </div>
 
 
+
+  <!--Footerr-->
+<footer class="site-footer">
+      © 2025 Innowave. All rights reserved.
+</footer>
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script>
+  const bgVideo = document.getElementById("bgVideo");
+  if (bgVideo) {
+    bgVideo.playbackRate = 0.8;
+  }
+</script>
 
   <!-- Scripts (order matters) -->
   <script src="sidebar.js"></script>
   <script src="home.js"></script>
+
 </body>
 </html>

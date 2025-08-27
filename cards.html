@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PWC Glassmorphism Cards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sidebar.css">
+  <style>
+    :root{
+      --card-bg: rgba(255,255,255,0.12);
+      --card-border: rgba(255,255,255,0.28);
+      --shadow: 0 8px 24px rgba(0,0,0,0.10);
+
+      --gray-opacity35: rgba(120,120,120,0.35);
+      --primary-radius: 18px;
+      --white: #fff;
+      --header-h: 70px;
+      --pad-x: 16px;
+      --container-max: 94vw;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin: 0;
+      font-family: Inter, system-ui;
+       background:#fed7aa63;   /* PwC charcoal gray */
+  min-height: 100vh;
+  color: #fff;   
+    }
+
+    /* ===== Top Bar ===== */
+    #menuBtn { height:16px; width:auto; cursor:pointer; }
+    .header-wrapper{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: max(12px, env(safe-area-inset-top));
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: var(--container-max);
+      height: var(--header-h);
+      padding: 0 calc(var(--pad-x) + 14px) 0 var(--pad-x);
+      box-sizing: border-box;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      background-color: var(--gray-opacity35);
+      border-radius: var(--primary-radius);
+    }
+    .header-container{ display:flex; align-items:center; gap:8px; color: var(--white); }
+    .header-container img{ height: clamp(22px, 2.5vw, 24px); width:auto; }
+    .header-container p{ margin:0; line-height:1.05; font-size: clamp(14px, 2.4vw, 16px); font-weight:500; }
+
+    @media (min-width: 768px){
+      :root{ --header-h: 70px; --pad-x: 24px; --container-max: 92vw; }
+    }
+    @media (max-width: 480px){ .header-container p{ display:none; } }
+
+    .page-padder{ height: calc(var(--header-h) + 28px); }
+
+    /* ===== Cards Layout ===== */
+    .grid{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .row{ display:flex; justify-content:center; gap:24px; width:100%; flex-wrap: wrap; }
+
+    .card{
+      flex: 1 1 calc(33.333% - 24px);
+      min-width: 250px;
+      max-width: 320px;
+      height: 220px;
+      border-radius: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 16px 18px; text-align: center;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .card:hover{ transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,.14); }
+    .card-title{ margin:0; font-size:17px; font-weight:700; color:#3f3f3e; }
+
+    @media (max-width: 1024px){ .card{ flex: 1 1 calc(45% - 24px); } }
+    @media (max-width: 600px){ .card{ flex: 1 1 100%; } }
+  /* --- Animated SVG background container --- */
+.bg-wrap{
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;            /* content sits above */
+  pointer-events: none;  /* don't block clicks */
+}
+.bg-wrap svg{ width:100%; height:100%; display:block; }
+
+/* make sure content stays above the bg */
+.grid{ position: relative; z-index: 1; }
+
+  </style>
+</head>
+<body>
+   <!-- Animated PwC-style waves background -->
+  <div class="bg-wrap" aria-hidden="true">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         width="100%" height="100%" viewBox="0 0 1600 900"
+         preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="bg">
+          <stop offset="0%"   style="stop-color:rgba(242,174,28,0.30)" />
+          <stop offset="50%"  style="stop-color:rgba(232,119,34,0.60)" />
+          <stop offset="100%" style="stop-color:rgba(173,28,45,0.30)" />
+        </linearGradient>
+
+        <path id="wave" fill="url(#bg)"
+          d="M-363.852,502.589c0,0,236.988-41.997,505.475,0
+             s371.981,38.998,575.971,0s293.985-39.278,505.474,5.859
+             s493.475,48.368,716.963-4.995v560.106H-363.852V502.589z" />
+      </defs>
+
+      <g>
+        <use xlink:href="#wave" opacity=".15">
+          <animateTransform attributeName="transform" attributeType="XML"
+            type="translate" dur="10s" calcMode="spline"
+            values="270 230; -334 180; 270 230"
+            keyTimes="0; .5; 1"
+            keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
+            repeatCount="indefinite" />
+        </use>
+
+        <use xlink:href="#wave" opacity=".25">
+          <animateTransform attributeName="transform" attributeType="XML"
+            type="translate" dur="8s" calcMode="spline"
+            values="-270 230;243 220;-270 230"
+            keyTimes="0; .6; 1"
+            keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
+            repeatCount="indefinite" />
+        </use>
+
+        <use xlink:href="#wave" opacity=".35">
+          <animateTransform attributeName="transform" attributeType="XML"
+            type="translate" dur="6s" calcMode="spline"
+            values="0 230;-140 200;0 230"
+            keyTimes="0; .4; 1"
+            keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
+            repeatCount="indefinite" />
+        </use>
+      </g>
+    </svg>
+  </div>
+
+  <header class="header-wrapper" id="appHeader">
+    <!-- left -->
+    <div class="header-container">
+      <img id="menuBtn" src="../assets/icons/Menu.svg" alt="Menu" />
+      <img src="../assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+        Workstation<br/>by Innowave
+      </p>
+    </div>
+    <!-- right (Analytics) -->
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+    
+            <img src="../assets/icons/Analytics.svg" alt="Analytics" />
+      <p style="margin:0">Analytics</p>
+      
+    </div>
+    
+  </header>
+
+  <!-- Backdrop for sidebar -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <!-- Spacer -->
+  <div class="page-padder"></div>
+
+  <!-- Cards -->
+  <section class="grid">
+    <div class="row">
+      <div class="card"><h3 class="card-title">HVAC</h3></div>
+      <div class="card"><h3 class="card-title">Life Safty</h3></div>
+      <div class="card"><h3 class="card-title">Lighting</h3></div>
+      <div class="card"><h3 class="card-title">Electrical Systems</h3></div>
+      <div class="card"><h3 class="card-title">Water meters</h3></div>
+    </div>
+  </section>
+
+  <script src="sidebar.js"></script>
+  <script src="first.js"></script>
+</body>
+</html>

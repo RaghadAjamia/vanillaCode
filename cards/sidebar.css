@@ -1,0 +1,180 @@
+/* ---------- Backdrop ---------- */
+.backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  z-index: 1400;                 /* below sidebar */
+}
+.backdrop.show{ display:block }
+
+/* ---------- Tokens ---------- */
+:root{
+  --sb-radius: 18px;
+  --sb-text: #fff;
+  --sb-border: rgba(255,255,255,.22);
+  --sb-bg: rgba(255,255,255,.08);               /* glass */
+  --sb-hover: rgba(255,255,255,.12);
+  --sb-muted: rgba(255,255,255,.55);
+  --sb-shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+
+/* ---------- Base (mobile / tablet = overlay) ---------- */
+.sidebar{
+  position: fixed; inset: 0; z-index: 1500;
+  display: none;                           /* shown via .openSideBar */
+  padding: 28px 22px;
+  color: var(--sb-text);
+
+  background: var(--sb-bg);
+  border: 1px solid var(--sb-border);
+  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: var(--sb-shadow);
+
+  display: none; flex-direction: column; gap: 18px;
+  transform: translateX(-100%); opacity: 0;
+  transition: transform .28s ease, opacity .28s ease;
+}
+.sidebar.openSideBar{ display:flex; transform: translateX(0); opacity:1; }
+
+/* Headings */
+.sidebar h1{ margin: 4px 0 6px; font-size: 20px; font-weight: 700; letter-spacing:.2px }
+
+/* Sections + scrolling */
+.sectionContainer{ display:flex; flex-direction:column; gap:8px; }
+.sidebar{ overflow:auto; }
+
+/* List + items */
+ul{ margin:0; padding:0; }
+li{ list-style:none; min-height:34px; color:var(--sb-text); }
+.item, .dropdownToggle{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:12px;
+  cursor:pointer; border:1px solid transparent;
+}
+.item:hover, .dropdownToggle:hover{ background: var(--sb-hover); }
+
+.dropdown{ margin:6px 0 6px 28px; padding-left:12px; border-left:1px solid rgba(255,255,255,.14); display:none; }
+.dropdown.show{ display:block; }
+
+.dropdownToggle{ background: transparent; border:0; color:var(--sb-text); font-size:15px; width:100%; }
+.dropdownToggle p{ margin:0 }
+.dropdownToggle .title {
+  font-size: 14px; /* الحجم الجديد */
+  line-height: 1.2;
+}
+
+/* Icons (inline SVGs) */
+.sidebar svg{ width:18px; height:18px; stroke: #fff; opacity:.9 }
+.chev{ transition: transform .2s ease; }
+.dropdownToggle[aria-expanded="true"] .chev{ transform: rotate(90deg); }
+
+/* Close (X) only on mobile/tablet */
+.closeSideBar{ position:absolute; right:20px; top:20px; cursor:pointer; display:block; }
+
+/* ---------- Laptop+ = floating glass card ---------- */
+/* === Desktop/laptop (align with topbar, same glass, shorter height) === */
+@media (min-width: 1024px){
+  :root{
+    /* tune these if you want tighter spacing */
+    --sb-top-gap:20px;      /* distance below the header */
+    --sb-bottom-gap: 36px;   /* distance above bottom */
+  }
+
+  .sidebar{
+    /* place it so its LEFT edge equals the header's LEFT inner edge */
+    /* header is centered with width: var(--container-max) and padding var(--pad-x) */
+    left: calc(48% - var(--container-max) / 2 + var(--pad-x));
+    top:  calc(var(--header-h) + var(--sb-top-gap));
+    right: auto; bottom: auto;
+
+    width: 200px;                          /* card width */
+    height: calc(100vh - var(--header-h) - var(--sb-top-gap) - var(--sb-bottom-gap));
+    max-height: clamp(420px, 75vh, 760px); /* keep it shorter and elegant */
+
+    /* same glass look as topbar */
+    background-color: var(--gray-opacity35);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid var(--gray-opacity35);
+    border-radius: var(--primary-radius);
+
+    /* subtle shadow to float above the plan */
+    box-shadow: 0 12px 40px rgba(0,0,0,.30);
+
+    /* no slide-in when docked */
+    transform: none;
+    opacity: 1;
+
+    /* still hidden until opened */
+    display: none;
+  }
+
+  .sidebar.openSideBar{ display:flex; }
+
+  /* desktop: hide the mobile close (X) */
+  .closeSideBar{ display:none; }
+}
+#anaGauge { background: #fff; border-radius: 10px; }
+/* ===== Scrollbar Styling for Sidebar ===== */
+.sidebar {
+  overflow: auto;
+  overscroll-behavior: contain;       /* يمنع الباونس */
+  scrollbar-gutter: stable both-edges;
+  -webkit-overflow-scrolling: touch;  /* smooth scroll للموبايل */
+}
+
+/* WebKit Browsers (Chrome, Edge, Safari) */
+.sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.08);
+  border-radius: 10px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,#ffb769,#ff8a00);
+  border-radius: 10px;
+  border: 2px solid transparent; /* يعطي سماكة ناعمة */
+  background-clip: padding-box;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.05);
+}
+
+/* Firefox */
+.sidebar {
+  scrollbar-width: thin; /* thin | auto */
+  scrollbar-color: #818080c8 rgba(255,255,255,.08);
+}
+
+/* Fade effect at top/bottom of sidebar */
+.sidebar::before,
+.sidebar::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:20px;
+  pointer-events:none;
+}
+.sidebar::before {
+  top:0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.22), transparent 60%);
+  border-radius: var(--primary-radius) var(--primary-radius) 0 0;
+}
+.sidebar::after {
+  bottom:0;
+  background: linear-gradient(to top, rgba(0,0,0,.22), transparent 60%);
+  border-radius: 0 0 var(--primary-radius) var(--primary-radius);
+}
+.sidebar a {
+  color: var(--sb-text);       /* white text from your sidebar theme */
+  text-decoration: none;       /* remove underline */
+  display: block;              /* make it fill the li */
+  padding: 6px 0;              /* optional spacing */
+  font-size: 14px;              /* optional smaller font */
+}
+
+.sidebar a:hover {
+  color: var(--sb-muted);      /* lighter color on hover */
+}

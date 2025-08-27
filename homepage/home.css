@@ -5,7 +5,6 @@
   --muted:#e3e3e3;
   --accent:#ffffff;
   --brand:#ff8a00;
-  --shadow: 0 10px 30px rgba(0,0,0,.28);
   --radius: 18px;
 }
 
@@ -15,11 +14,8 @@ html,body{height:100%}
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-  color: var(--ink);
   background:
-    linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,.4)),
-    url('../assets/images/Home.png') center/cover no-repeat fixed;
-  overflow-x:hidden;
+    url('../assets/images/Image12\ copy.png') center/cover no-repeat fixed;
 }
 #bgVideo {
   position: fixed;
@@ -27,18 +23,19 @@ body{
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;       /* يملأ الشاشة ويقص الأطراف */
-  object-position: center top; /* يثبت الفيديو من الأعلى */
-  z-index: -1;             /* خلف المحتوى */
+  object-fit: cover;
+  object-position: center center;
+  z-index: -1;
 }
+
 
 
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,.4));
-  z-index: 0; /* فوق الفيديو وتحت المحتوى */
+  background: linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,.6));
+  z-index: 0; 
 }
 
 
@@ -385,3 +382,19 @@ body {
     display: none !important;
   }
 }
+
+    /* ===== Footer ===== */
+    .site-footer {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 16px;
+      border-radius: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }

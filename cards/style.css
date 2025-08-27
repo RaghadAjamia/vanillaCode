@@ -1,0 +1,275 @@
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('../assets/images/Image12\ copy.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, Helvetica, sans-serif; /* 👈 الخط Arial */
+
+}
+/* Bottom-to-middle overlay (on top of bg, under UI) */
+body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(60vh + env(safe-area-inset-bottom)); /* covers bottom ~60% */
+  pointer-events: none;
+  z-index: 1; /* above body::before (0), below UI (we’ll set UI to ≥2) */
+
+  /* Nice layered gradient: soft dark + subtle brand glow */
+  background:
+    /* subtle brand tint glow from bottom-left (optional) */
+    radial-gradient(120% 60% at 12% 100%, rgba(255,138,0,.12) 0%, rgba(255,138,0,0) 55%),
+    /* main dark gradient */
+    linear-gradient(
+      to top,
+      rgba(0,0,0,0.65) 0%,
+      rgba(0,0,0,0.50) 25%,
+      rgba(0,0,0,0.30) 50%,
+      rgba(0,0,0,0.12) 75%,
+      rgba(0,0,0,0)   100%
+    );
+}
+
+/* Make sure your content sits above the overlay */
+.center-stage { position: relative; z-index: 2 }
+
+/*---->>>>>> TopBar <<<<<<----*/
+/* Background video full screen */
+.bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* crops video to fill screen */
+  z-index: -1;          /* behind everything */
+}
+
+/* Optional: dark overlay to improve contrast */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35); /* adjust darkness */
+  z-index: 0;
+}
+
+/* === Header (SCSS port) === */
+#menuBtn {
+  height: 16px; /* smaller menu icon */
+  width: auto;
+}
+:root{
+  --gray-opacity35: rgba(120,120,120,0.35);
+  --primary-radius: 18px;
+  --white: #fff;
+
+  /* layout tokens */
+  --header-h: 70px;
+  --pad-x: 16px;
+  --gap: 12px;
+  --container-max: 92vw;
+}
+
+/* ===== Header ===== */
+.header-wrapper{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: max(12px, env(safe-area-inset-top));
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: var(--container-max);
+  height: var(--header-h);
+  padding: 0 calc(var(--pad-x) + 14px) 0 var(--pad-x);
+  box-sizing: border-box;
+
+  backdrop-filter: blur(5px);
+  background-color: var(--gray-opacity35);
+  border-radius: var(--primary-radius);
+}
+
+.header-container{
+  display:flex; align-items:center; gap:8px;
+  color: var(--white);
+}
+.header-container > *{ cursor:pointer }
+
+/* Icon sizing */
+.header-container img{
+  height: clamp(22px, 2.5vw, 24px);
+  width: auto;
+}
+
+/* Brand text spacing */
+.header-container p{
+  margin:0; line-height:1.05; font-size: clamp(16px, 2.6vw, 16px);font-weight:500;padding-right: 5px;
+}
+
+/* ===== Breakpoints ===== */
+@media (min-width: 768px){
+  :root{
+    --header-h: 70px;
+    --pad-x: 24px;
+    --gap: 14px;
+    --container-max: 94vw;
+  }
+}
+@media (min-width: 0px){
+  :root{
+    --header-h: 80px;
+    --pad-x: 30px;
+    --gap: 16px;
+    --container-max: 90vw;
+  }
+}
+@media (min-width: 1440px){
+  :root{ --container-max: 90vw; }
+}
+
+/* Small phones (≤ 480px) — icons only */
+@media (max-width: 480px){
+  .header-container p{ display:none; }
+}
+
+
+/*---->>>>>> Crds <<<<<<----*/
+/* ===== Center stage wrapper (keeps cards in the middle) ===== */
+.center-stage {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: calc(var(--header-h) + 24px) 24px 100px; /* account for header + footer */
+  box-sizing: border-box;
+}
+
+/* ===== Row of 4 cards ===== */
+.center-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr)); /* 4 cards side by side */
+  gap: 20px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* ===== Glassmorphism cards (same effect as header) ===== */
+.glass-card {
+  padding: 20px;
+  border-radius: var(--primary-radius);
+  background-color: var(--gray-opacity35);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  color: var(--white);
+  text-align: center;
+
+  /* 👇 Center icon + title vertically + horizontally */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertical center */
+  align-items: center;      /* horizontal center */
+
+  min-height: 220px;        /* ensure consistent height */
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.glass-card img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.glass-card h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0,0,0,.32);
+}
+
+/* Icon + title inside cards */
+.glass-card img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+.glass-card h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.glass-card p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  opacity: .9;
+}
+
+/* ===== Responsive: stack into fewer columns ===== */
+@media (max-width: 1024px) {
+  .center-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2x2 on tablets */
+  }
+}
+@media (max-width: 600px) {
+  .center-grid {
+    grid-template-columns: 1fr; /* stack on small screens */
+  }
+}
+
+/*---->>>>>> Footer <<<<<<----*/
+.footer-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px; /* adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centers content horizontally */
+  z-index: 100000;
+  pointer-events: none;
+}
+
+.footer-bar-content {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.footer-logo {
+  position: absolute;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.footer-logo img {
+  height: 160px;
+  width: auto;
+  opacity: 0.9;
+}
+
+.footer-copyright {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.85;
+  text-align: center;
+  pointer-events: none;
+}
+
+

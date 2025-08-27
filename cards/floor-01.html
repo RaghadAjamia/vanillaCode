@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PWC Workstation – Floor Plan</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../first.css">
+  <link rel="stylesheet" href="../sidebar.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header-wrapper" id="appHeader">
+    <!-- left -->
+    <div class="header-container">
+      <img id="menuBtn" src="../assets/icons/Menu.svg" alt="Menu" />
+      <img src="../assets/images/pwc_white.png" alt="Logo" style="height:70px" />
+      <p style="margin:0; line-height:1.05">
+        Workstation<br/>by Innowave
+      </p>
+    </div>
+    <!-- right (Analytics) -->
+    <div class="header-container" id="analyticsBtn" role="button" tabindex="0">
+         <img src="../assets/images/lets-icons_humidity-light.png" alt="Analytics" />
+      <p style="margin:0">49%</p>
+
+      <img src="../assets/icons/mdi_temperature.png"alt="Analytics" />
+      <p style="margin:0">36.5</p>
+      <img src="../assets/icons/light.png" alt="Light" />
+      <p style="margin:0">Light</p>
+      <p></p>
+      <img src="../assets/icons/hvacc.png" alt="HVAC" />
+      <p style="margin:0">HVAC</p>
+      <p></p>
+      <img src="../assets/icons/alert-fill.png" alt="Alarm" />
+      <p style="margin:0">Alarm</p>
+      <p></p>
+      <img src="../assets/icons/dash.png" alt="Analytics" />
+      <p style="margin:0">Analytics</p>
+    </div>
+  </header>
+
+  <!-- Backdrop (keep this; the sidebar is added by JS) -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <!-- Bottom center pills -->
+  <div class="bottom-pills">
+    <button class="pill" id="pillLight" title="Lights">
+      <img src="../assets/icons/light_dark.png" alt="Light" />
+      Light
+    </button>
+    <button class="pill" id="pillCO2" title="CO2">
+      <img src="../assets/icons/co2.png" alt="CO2" />
+      CO2
+    </button>
+    <button class="pill" id="pillFire" title="Fire">
+      <img src="../assets/icons/fire.png" alt="Fire" />
+      Fire
+    </button>
+        <button class="pill" id="pillFire" title="Fire">
+      <img src="../assets/icons/icon1.png" alt="Fire" />
+      HVAC 
+    </button>
+  </div>
+
+  <!-- Right floating floors -->
+  <div class="floater">
+    <a href="/floor5" class="fab">F5</a>
+    <a href="/floor4" class="fab">F4</a>
+    <a href="/floor3" class="fab">F3</a>
+  </div>
+
+  <!-- Analytics Modal -->
+  <div class="ana-modal" id="anaModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="ana-sheet" role="document">
+      <header class="ana-head">
+        <h2>Floor No.4 Analytics</h2>
+        <button class="ana-close" id="anaClose" aria-label="Close">&times;</button>
+      </header>
+
+      <div class="ana-grid">
+        <!-- Line Chart -->
+        <section class="ana-card line-main">
+          <h3>Total Power</h3>
+          <canvas id="anaLine1"></canvas>
+        </section>
+
+        <!-- Gauge -->
+        <section class="ana-card gauge-card">
+          <h3>Total Power</h3>
+          <div class="gauge-wrap">
+            <div id="anaGauge"></div>
+          </div>
+        </section>
+
+        <!-- 3 Stacked Cards -->
+        <div class="side-cards">
+          <div class="ana-card white-card">
+            <span class="title">Power Factor</span>
+            <strong>3,671</strong>
+            <div class="ana-sub">−0.05%</div>
+          </div>
+          <div class="ana-card white-card">
+            <span class="title">AVG. CO2 Level</span>
+            <strong>3,671</strong>
+            <div class="ana-bar"><div style="width:62%"></div></div>
+          </div>
+          <div class="ana-card white-card">
+            <span class="title">Another Metric</span>
+            <strong>2,145</strong>
+            <div class="ana-bar"><div style="width:45%"></div></div>
+          </div>
+        </div>
+
+        <!-- Second Row Charts -->
+        <section class="ana-card line-2">
+          <h3>Total Energy</h3>
+          <canvas id="anaLine2"></canvas>
+        </section>
+
+        <section class="ana-card line-3">
+          <h3>Water Consumption</h3>
+          <canvas id="anaLine3"></canvas>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom-left env info (self-contained, white icons + readings) -->
+  <div class="left-info" role="group" aria-label="Environment readings">
+    <div class="env-block" aria-label="Temperature">
+      <!-- Thermometer icon (inline SVG, forced white) -->
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor"
+          d="M17 11.5V5a5 5 0 1 0-10 0v6.5A6.5 6.5 0 1 0 17 11.5Zm-8-6.5a3 3 0 1 1 6 0v7.03l.32.25A4.5 4.5 0 1 1 8.68 19a4.48 4.48 0 0 1 1.32-3.18l.32-.25Zm3 5.5a1 1 0 0 0-1 1v3.09a2.5 2.5 0 1 0 2 0V11.5a1 1 0 0 0-1-1Z"/>
+      </svg>
+      <div class="env-value" id="envTempValue">36.5°</div>
+    </div>
+
+    <div class="env-block" aria-label="Humidity">
+      <!-- Humidity icon (inline SVG, forced white) -->
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor"
+          d="M12 2s6 6.34 6 10a6 6 0 1 1-12 0c0-3.66 6-10 6-10Zm-1.5 9.25a.75.75 0 0 0-1.5 0 3 3 0 0 0 3 3 .75.75 0 0 0 0-1.5 1.5 1.5 0 0 1-1.5-1.5Z"/>
+      </svg>
+      <div class="env-value" id="envHumValue">42%</div>
+    </div>
+  </div>
+
+  <!-- Local styles for env info + safety z-index for modal -->
+  <style>
+    /* Keep the analytics modal above header if your CSS sets header z-index high */
+    .ana-modal { z-index: 1400; }
+.left-info {
+  position: fixed;
+  left: 18px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;   /* stack rows vertically */
+  align-items: flex-start;  /* align left edge */
+  gap: 8px;                 /* space between temp row and humidity row */
+  z-index: 2000;            
+  pointer-events: none;     
+}
+
+.left-info .env-block {
+  display: flex;
+  flex-direction: row;      /* icon + value side by side */
+  align-items: center;
+  gap: 6px;                  /* space between icon and value */
+}
+
+.left-info .icon {
+  width: 28px;
+  height: 28px;
+  color: #fff;
+  display: block;
+}
+
+.left-info .env-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+
+@media (pointer: coarse) {
+  .left-info .icon { width: 32px; height: 32px; }
+  .left-info .env-value { font-size: 15px; }
+}
+
+  </style>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+  <!-- App scripts (order matters) -->
+  <script src="../sidebar.js"></script>
+  <script src="../first.js"></script>
+
+  <!-- Optional tiny drift so you see values changing (remove if you don't want it) -->
+  <script>
+    (function(){
+      const tEl = document.getElementById('envTempValue');
+      const hEl = document.getElementById('envHumValue');
+      if(!tEl || !hEl) return;
+
+      let t = 36.5, h = 42;
+      setInterval(()=>{
+        t += (Math.random() - 0.5) * 0.1;
+        h += (Math.random() - 0.5) * 0.4;
+        h = Math.max(15, Math.min(90, h));
+        tEl.textContent = t.toFixed(1) + '°';
+        hEl.textContent = Math.round(h) + '%';
+      }, 2500);
+    })();
+  </script>
+</body>
+</html>

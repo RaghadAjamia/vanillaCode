@@ -1,0 +1,108 @@
+<script>
+/**
+ * Real weather via OpenWeatherMap
+ * - Uses browser geolocation; falls back to Amman, Jordan.
+ * - Updates:
+ *    #weatherTemp (top bar)
+ *    #envTempValue (bottom-left)
+ *    #envHumValue (bottom-left)
+ *    #weatherIcon (inline SVG in top bar)
+ */
+(function(){
+  const API_KEY = 'YOUR_API_KEY_HERE';               // <-- put your key here
+  const FALLBACK = { lat: 31.9539, lon: 35.9106 };   // Amman, Jordan
+  const UNITS = 'metric';                            // 'metric' => °C
+
+  const elTopTemp = document.getElementById('weatherTemp');
+  const elBotTemp = document.getElementById('envTempValue');
+  const elBotHum  = document.getElementById('envHumValue');
+  const elIcon    = document.getElementById('weatherIcon');
+
+  if(!API_KEY || API_KEY === 'YOUR_API_KEY_HERE'){
+    console.warn('[weather] Please set your OpenWeather API key.');
+    return;
+  }
+
+  function setTextSafe(el, text){
+    if (el) el.textContent = text;
+  }
+
+  function setWeatherIconById(id){
+    if (!elIcon) return;
+    // Map OpenWeather "weather.id" to a simple icon (sun/cloud/rain/etc.)
+    // Ref: https://openweathermap.org/weather-conditions
+    let svg = ''; // default sunny
+    if (id >= 200 && id < 300) {
+      // Thunderstorm
+      svg = '<path fill="currentColor" d="M6 14a4 4 0 0 1 2.8-3.82A5 5 0 0 1 18 10a4 4 0 1 1 0 8H9.5l1.6-3H9l2-4h-2l1.2-2.4L9 8h3l-1.2 2.4H13l-2 4h2.1L11 18h7a6 6 0 0 0 0-12 7 7 0 0 0-13.87 1.35A6 6 0 0 0 6 22h3"/>'
+    } else if (id >= 300 && id < 400) {
+      // Drizzle
+      svg = '<path fill="currentColor" d="M7 17h2l-1 2H6l1-2Zm4 0h2l-1 2h-2l1-2Zm4 0h2l-1 2h-2l1-2ZM6 14a4 4 0 0 1 2.8-3.82A5 5 0 0 1 18 10a4 4 0 1 1 0 8H8a4 4 0 0 1-2-4Z"/>'
+    } else if (id >= 500 && id < 600) {
+      // Rain
+      svg = '<path fill="currentColor" d="M6 14a4 4 0 0 1 2.8-3.82A5 5 0 0 1 18 10a4 4 0 1 1 0 8H8a4 4 0 0 1-2-4Zm2.5 5.5 1.5-3 1.5 3h-3Zm5 0 1.5-3 1.5 3h-3Z"/>'
+    } else if (id >= 600 && id < 700) {
+      // Snow
+      svg = '<path fill="currentColor" d="M12 4a6 6 0 0 0-6 6v.5A3.5 3.5 0 1 0 9.5 18h5A4.5 4.5 0 1 0 17 9.5 6 6 0 0 0 12 4Zm-2 12.5-1 1 1 1 1-1-1-1Zm6 0-1 1 1 1 1-1-1-1Zm-3 2-1 1 1 1 1-1-1-1Z"/>'
+    } else if (id >= 700 && id < 800) {
+      // Atmosphere (mist, haze)
+      svg = '<path fill="currentColor" d="M3 10h18v2H3v-2Zm0 4h18v2H3v-2Zm2 4h14v2H5v-2ZM5 6h14v2H5V6Z"/>'
+    } else if (id === 800) {
+      // Clear
+      svg = '<path fill="currentColor" d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zm10.48 0 1.79-1.79 1.41 1.41-1.79 1.8-1.41-1.42zM12 4V1h0v3h0zm0 19v-3h0v3h0zm7-7h3v0h-3v0zM2 16H-1v0h3v0zm15.24 3.16 1.8 1.79 1.41-1.41-1.79-1.8-1.42 1.42zM4.84 17.24l-1.79 1.8 1.41 1.41 1.8-1.79-1.42-1.42zM12 7a5 5 0 100 10 5 5 0 000-10z"/>'
+    } else if (id > 800) {
+      // Clouds
+      svg = '<path fill="currentColor" d="M6 14a4 4 0 0 1 2.8-3.82A5 5 0 0 1 18 10a4.5 4.5 0 1 1 0 9H9a5 5 0 0 1-3-5Z"/>'
+    }
+    elIcon.innerHTML = svg || '<circle cx="12" cy="12" r="5" fill="currentColor"/>';
+  }
+
+  function applyWeather(data){
+    if (!data || !data.main) return;
+    const temp = data.main.temp;
+    const hum  = data.main.humidity;
+    const id   = (data.weather && data.weather[0] && data.weather[0].id) ? data.weather[0].id : 800;
+
+    // Top bar
+    setTextSafe(elTopTemp, `${temp.toFixed(1)}°C`);
+    setWeatherIconById(id);
+
+    // Bottom-left
+    setTextSafe(elBotTemp, `${temp.toFixed(1)}°`);
+    setTextSafe(elBotHum, `${Math.round(hum)}%`);
+  }
+
+  async function fetchWeatherByCoords(lat, lon){
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${UNITS}&appid=${API_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Weather fetch failed: ' + res.status);
+    return res.json();
+  }
+
+  function loadWithGeolocation(){
+    if (!navigator.geolocation) {
+      return fetchWeatherByCoords(FALLBACK.lat, FALLBACK.lon).then(applyWeather).catch(console.warn);
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const { latitude, longitude } = pos.coords || {};
+        fetchWeatherByCoords(latitude || FALLBACK.lat, longitude || FALLBACK.lon)
+          .then(applyWeather)
+          .catch(err=>{
+            console.warn('[weather] Using fallback after error:', err);
+            return fetchWeatherByCoords(FALLBACK.lat, FALLBACK.lon).then(applyWeather);
+          });
+      },
+      (_err)=>{
+        // Permission denied or unavailable => fallback to Amman
+        fetchWeatherByCoords(FALLBACK.lat, FALLBACK.lon).then(applyWeather).catch(console.warn);
+      },
+      { enableHighAccuracy:false, timeout: 5000, maximumAge: 10*60*1000 }
+    );
+  }
+
+  // Initial load + refresh every 10 minutes
+  loadWithGeolocation();
+  setInterval(loadWithGeolocation, 10 * 60 * 1000);
+})();
+</script>

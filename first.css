@@ -7,6 +7,9 @@
   --brand:#ff8a00;
   --shadow: 0 10px 30px rgba(0,0,0,.28);
   --radius: 18px;
+  /* tweak if you want it darker/lighter */
+  --overlay-bottom: rgba(0,0,0,.68);
+  --overlay-mid:    rgba(0,0,0,0);
 }
 
 /* ===== Base / background ===== */
@@ -17,9 +20,35 @@ body{
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
   color: var(--ink);
   background:
-    linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.1)),
-    url('assets/images/Home.png') center/cover no-repeat fixed;
+    linear-gradient(180deg, rgba(0, 0, 0, 0.474), rgba(0,0,0,.1)),
+    url('assets/images/L01.png') center/cover no-repeat fixed;
   overflow-x:hidden;
+  position: relative;
+}
+/* Sits above the background image, below all content */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1; /* content (header, pills, etc.) already uses higher z-index */
+
+  /* Fade from bottom (dark) to ~center (transparent) */
+  background: linear-gradient(
+    to top,
+    var(--overlay-bottom) 0%,
+    rgba(0,0,0,.46) 16%,
+    rgba(0,0,0,.34) 28%,
+    rgba(0,0,0,.22) 38%,
+    rgba(0,0,0,.12) 46%,
+    var(--overlay-mid) 50%
+  );
+}
+
+/* keep header/pills clearly above if needed */
+.header-wrapper, .bottom-pills, .floater, .mini, .ana-modal, .ana-sheet{
+  position: relative;
+  z-index: 900; /* or higher than 1 */
 }
 
 /* === Header (SCSS port) === */
@@ -87,7 +116,7 @@ body{
     --container-max: 94vw;
   }
 }
-@media (min-width: 1024px){
+@media (min-width: 0px){
   :root{
     --header-h: 80px;
     --pad-x: 30px;
